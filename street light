@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Location Sender</title>
+</head>
+<body>
+
+  <h2>📍 Live Location Tracking</h2>
+  <p id="status">Starting...</p>
+
+  <script>
+    // 🔴 Replace with YOUR Google Script URL
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzQuAcWWzfam4wrpqmnOigd-AsZSxuTNYdj_JG9L56yFzAJ5t5qzxVOsHoOkWhpd8K_2g/exec";
+
+    function sendLocation(lat, lng) {
+      fetch(`${WEB_APP_URL}?phonelat=${lat}&phonelng=${lng}`)
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("status").innerText =
+            `✅ Sent: ${lat}, ${lng}`;
+        })
+        .catch(err => {
+          document.getElementById("status").innerText =
+            "❌ Error: " + err;
+        });
+    }
+
+    function startTracking() {
+      if (!navigator.geolocation) {
+        document.getElementById("status").innerText =
+          "Geolocation not supported.";
+        return;
+      }
+
+      navigator.geolocation.watchPosition(
+        function(position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          sendLocation(lat, lng);
+        },
+        function(error) {
+          document.getElementById("status").innerText =
+            "Location error: " + error.message;
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 10000
+        }
+      );
+    }
+
+    startTracking();
+  </script>
+
+</body>
+</html>
