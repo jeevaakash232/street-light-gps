@@ -1,20 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Location</title>
+</head>
+<body>
+
+<h2>📍 Live Location Tracking</h2>
+<p id="status">Starting...</p>
+
 <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxEgiyF_xn1FP09MznNRZ-Szn4jlo61cC3fYwreLsMsTF2hYzntyC1Rhs-ODDQCzmSP/exec";
 
 function sendLocation(lat, lng) {
-  const url = `${WEB_APP_URL}?phonelat=${lat}&phonelng=${lng}&t=${Date.now()}`;
+  const url = WEB_APP_URL + "?phonelat=" + lat + "&phonelng=" + lng;
 
-  fetch(url, {
-    method: "GET",
-    mode: "no-cors"
-  })
-  .then(() => {
-    document.getElementById("status").innerText =
-      `✅ Sent: ${lat}, ${lng}`;
-  })
-  .catch(err => {
-    document.getElementById("status").innerText =
-      "❌ Error: " + err;
-  });
+  fetch(url, { mode: "no-cors" })
+    .then(() => {
+      document.getElementById("status").innerText =
+        "✅ Sent: " + lat + ", " + lng;
+    })
+    .catch((err) => {
+      document.getElementById("status").innerText =
+        "❌ Error: " + err;
+    });
 }
+
+function startTracking() {
+  if (!navigator.geolocation) {
+    document.getElementById("status").innerText =
+      "Geolocation not supported";
+    return;
+  }
+
+  navigator.geolocation.watchPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+
+      sendLocation(lat, lng);
+    },
+    (err) => {
+      document.getElementById("status").innerText =
+        "Error: " + err.message;
+    }
+  );
+}
+
+startTracking();
 </script>
+
+</body>
+</html>
